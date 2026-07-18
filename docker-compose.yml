@@ -1,0 +1,54 @@
+# Production compose for Portainer. Exposes the admin app on :9000.
+services:
+  universal-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: universal-admin-app:latest
+    container_name: universal-admin
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      PORT: 9000
+      NODE_ENV: production
+      ISSUER: ${ISSUER:-http://localhost:9000}
+      DATABASE_URL: postgres://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-universal_admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:9000}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-900}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL:-2592000}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@example.com}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-change-me-now}
+      ENABLE_AUTH_COOKIES: ${ENABLE_AUTH_COOKIES:-true}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-lax}
+      # Optional: pin a stable signing key across DB resets (base64 PEM).
+      SIGNING_KEY_PEM_BASE64: ${SIGNING_KEY_PEM_BASE64:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -qO- http://localhost:9000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: universal-admin-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      POSTGRES_DB: ${POSTGRES_DB:-universal_admin}
+    volumes:
+      - universal-admin-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-universal_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  universal-admin-pgdata:

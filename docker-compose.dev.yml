@@ -1,0 +1,17 @@
+# Local Postgres for development. `pnpm db:up` starts it on :5433.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: universal-admin-dev-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: universal_admin
+    volumes:
+      - universal-admin-dev-pgdata:/var/lib/postgresql/data
+
+volumes:
+  universal-admin-dev-pgdata:

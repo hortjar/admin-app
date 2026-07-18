@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+**/dist
+**/build
+.git
+.env
+.env.*
+!.env.example
+data
+keys
+apps/web/src/api/generated
+*.log

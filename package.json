@@ -1,0 +1,30 @@
+{
+  "name": "universal-admin-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently --names server,web --prefix-colors cyan,magenta --kill-others-on-fail \"pnpm dev:server\" \"pnpm dev:web\"",
+    "dev:server": "pnpm --filter @universal-admin/server dev",
+    "dev:web": "pnpm --filter @universal-admin/web dev",
+    "build": "pnpm --filter @universal-admin/shared build && pnpm --filter @universal-admin/web build",
+    "db:up": "docker compose -f docker-compose.dev.yml up -d",
+    "db:down": "docker compose -f docker-compose.dev.yml down",
+    "migrate": "pnpm --filter @universal-admin/server migrate",
+    "seed": "pnpm --filter @universal-admin/server seed",
+    "generate:api": "pnpm --filter @universal-admin/web generate:api",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "typescript": "^5.7.2"
+  }
+}
