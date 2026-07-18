@@ -1,21 +1,19 @@
 # syntax=docker/dockerfile:1
 
-# ─── Stage 1: build the admin SPA + shared packages ────────────────────────────
+# ─── Stage 1: install + build (bun-only; the bun image has no Node/corepack) ────
 FROM oven/bun:1.3 AS build
 WORKDIR /app
 
-# Install with the full workspace so workspace deps resolve.
-COPY package.json pnpm-workspace.yaml ./
+# Copy the whole workspace so bun resolves workspace packages during install.
+COPY package.json tsconfig.base.json ./
 COPY packages ./packages
 COPY apps ./apps
 
-# Use corepack pnpm for the install (workspace-aware), Bun for runtime.
-RUN corepack enable && corepack prepare pnpm@9.15.1 --activate
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN bun install
 
-# Build shared types + the SPA.
-RUN pnpm --filter @universal-admin/shared build
-RUN pnpm --filter @universal-admin/web build
+# Build shared types, then the admin SPA.
+RUN bun run --cwd packages/shared build
+RUN bun run --cwd apps/web build
 
 # ─── Stage 2: runtime (Bun serves API + built SPA on one port) ─────────────────
 FROM oven/bun:1.3 AS runtime
@@ -24,15 +22,13 @@ ENV NODE_ENV=production
 ENV STATIC_DIR=/app/public
 ENV PORT=9000
 
-RUN corepack enable && corepack prepare pnpm@9.15.1 --activate
-
-COPY package.json pnpm-workspace.yaml ./
-COPY packages ./packages
-COPY apps/server ./apps/server
-RUN pnpm install --prod --frozen-lockfile || pnpm install --prod
-RUN pnpm --filter @universal-admin/shared build
-
-# Bring in the built SPA from stage 1.
+# Carry over installed deps + workspace sources (workspace symlinks stay valid
+# because node_modules and packages land at the same relative paths).
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/packages ./packages
+COPY --from=build /app/apps/server ./apps/server
+# Built SPA served as static files.
 COPY --from=build /app/apps/web/dist ./public
 
 EXPOSE 9000
