@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatDate } from "@/lib/utils";
+import { formatDate, labelize } from "@/lib/utils";
 
 export function AppsPage() {
   const { data: apps, isLoading } = useApps();
@@ -48,7 +48,7 @@ export function AppsPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {app.name}
-                  {app.disabled && <Badge variant="destructive">disabled</Badge>}
+                  {app.disabled && <Badge variant="destructive">Disabled</Badge>}
                 </CardTitle>
                 <code className="text-xs text-muted-foreground">{app.slug}</code>
               </div>
@@ -61,14 +61,14 @@ export function AppsPage() {
               <div className="flex flex-wrap gap-1">
                 {app.availableRoles.map((r) => (
                   <Badge key={r} variant="secondary">
-                    {r}
+                    {labelize(r)}
                   </Badge>
                 ))}
               </div>
               <div className="flex flex-wrap gap-1">
                 {app.availablePermissions.map((p) => (
                   <Badge key={p} variant="outline">
-                    {p}
+                    {labelize(p)}
                   </Badge>
                 ))}
               </div>

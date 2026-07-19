@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils";
+import { formatDate, labelize } from "@/lib/utils";
 
 const LEVELS: LogLevel[] = ["trace", "debug", "info", "warn", "error", "fatal"];
 
@@ -43,7 +43,7 @@ export function LogsPage() {
           <option value="">All levels</option>
           {LEVELS.map((l) => (
             <option key={l} value={l}>
-              {l}
+              {labelize(l)}
             </option>
           ))}
         </select>
@@ -80,7 +80,7 @@ export function LogsPage() {
               <TableRow key={log.id} className="cursor-pointer" onClick={() => setExpanded(expanded?.id === log.id ? null : log)}>
                 <TableCell className="font-mono text-xs text-muted-foreground">{formatDate(log.timestamp)}</TableCell>
                 <TableCell>
-                  <Badge variant={levelVariant(log.level)}>{log.level}</Badge>
+                  <Badge variant={levelVariant(log.level)}>{labelize(log.level)}</Badge>
                 </TableCell>
                 <TableCell className="text-sm">{log.app}</TableCell>
                 <TableCell className="text-sm">
