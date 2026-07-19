@@ -10,6 +10,20 @@ export function formatDate(value: string | null | undefined): string {
   return new Date(value).toLocaleString();
 }
 
+/**
+ * Human-friendly display label for an enum value (role, log level, status,
+ * permission…). Capitalises each word while the underlying stored value stays
+ * lowercase. e.g. "superadmin" → "Superadmin", "devices:write" → "Devices Write".
+ */
+export function labelize(value: string | null | undefined): string {
+  if (!value) return "—";
+  return value
+    .split(/[:._\-\s]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function relativeTime(value: string | null | undefined): string {
   if (!value) return "—";
   const diff = Date.now() - new Date(value).getTime();
