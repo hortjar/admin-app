@@ -51,7 +51,24 @@ export function useUpdateUser() {
   return useMutation({
     mutationFn: ({ id, ...body }: { id: string; displayName?: string; role?: string; disabled?: boolean }) =>
       request<UserDto>(`/api/admin/users/${id}`, { method: "PATCH", body }),
-    onSuccess: (_d, v) => {
+    // Optimistically patch every cached users list so toggles (enable/disable,
+    // role) feel instant instead of waiting for the refetch.
+    onMutate: async ({ id, ...patch }) => {
+      await qc.cancelQueries({ queryKey: ["users"] });
+      const snapshots = qc.getQueriesData<Paginated<UserDto>>({ queryKey: ["users"] });
+      for (const [key, page] of snapshots) {
+        if (!page) continue;
+        qc.setQueryData<Paginated<UserDto>>(key, {
+          ...page,
+          items: page.items.map((u) => (u.id === id ? ({ ...u, ...patch } as UserDto) : u)),
+        });
+      }
+      return { snapshots };
+    },
+    onError: (_e, _v, ctx) => {
+      ctx?.snapshots.forEach(([key, page]) => qc.setQueryData(key, page));
+    },
+    onSettled: (_d, _e, v) => {
       qc.invalidateQueries({ queryKey: ["users"] });
       qc.invalidateQueries({ queryKey: ["user", v.id] });
     },

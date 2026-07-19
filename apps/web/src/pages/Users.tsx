@@ -29,13 +29,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils";
+import { formatDate, labelize } from "@/lib/utils";
 
 export function UsersPage() {
   const [search, setSearch] = useState("");
   const { data, isLoading } = useUsers({ search, limit: 100 });
   const { data: apps } = useApps();
-  const [editing, setEditing] = useState<UserDto | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  // Derive the edited user from live query data so it re-renders after a
+  // mutation (enable/disable, role, membership) without needing a page refresh.
+  const editing = editingId ? (data?.items.find((u) => u.id === editingId) ?? null) : null;
 
   return (
     <div>
@@ -86,7 +89,7 @@ export function UsersPage() {
                 </TableCell>
                 <TableCell>
                   <Badge variant={u.role === "superadmin" ? "default" : u.role === "admin" ? "warning" : "secondary"}>
-                    {u.role}
+                    {labelize(u.role)}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -94,17 +97,17 @@ export function UsersPage() {
                     {u.apps.length === 0 && <span className="text-xs text-muted-foreground">—</span>}
                     {u.apps.map((a) => (
                       <Badge key={a.app} variant="outline">
-                        {a.app}
+                        {labelize(a.app)}
                       </Badge>
                     ))}
                   </div>
                 </TableCell>
                 <TableCell>
-                  {u.disabled ? <Badge variant="destructive">disabled</Badge> : <Badge variant="success">active</Badge>}
+                  {u.disabled ? <Badge variant="destructive">Disabled</Badge> : <Badge variant="success">Active</Badge>}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">{formatDate(u.lastLoginAt)}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => setEditing(u)}>
+                  <Button variant="ghost" size="sm" onClick={() => setEditingId(u.id)}>
                     <UserCog className="h-4 w-4" /> Manage
                   </Button>
                 </TableCell>
@@ -115,7 +118,7 @@ export function UsersPage() {
       </div>
 
       {editing && (
-        <ManageUserDialog user={editing} apps={apps ?? []} onClose={() => setEditing(null)} />
+        <ManageUserDialog user={editing} apps={apps ?? []} onClose={() => setEditingId(null)} />
       )}
     </div>
   );
@@ -169,9 +172,9 @@ function CreateUserDialog() {
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value })}
             >
-              <option value="user">user</option>
-              <option value="admin">admin</option>
-              <option value="superadmin">superadmin</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option>
             </select>
           </div>
         </div>
@@ -238,9 +241,9 @@ function ManageUserDialog({ user, apps, onClose }: { user: UserDto; apps: AppDto
               value={user.role}
               onChange={(e) => changeRole(e.target.value)}
             >
-              <option value="user">user</option>
-              <option value="admin">admin</option>
-              <option value="superadmin">superadmin</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option>
             </select>
           </div>
 
@@ -324,7 +327,7 @@ function MembershipEditor({ user, app }: { user: UserDto; app: AppDto }) {
                 onClick={() => toggle(roles, setRoles, r)}
                 className={`rounded-md border px-2 py-0.5 ${roles.includes(r) ? "border-primary bg-primary/15 text-primary" : "text-muted-foreground"}`}
               >
-                {r}
+                {labelize(r)}
               </button>
             ))}
           </div>
@@ -339,7 +342,7 @@ function MembershipEditor({ user, app }: { user: UserDto; app: AppDto }) {
                 onClick={() => toggle(perms, setPerms, p)}
                 className={`rounded-md border px-2 py-0.5 ${perms.includes(p) ? "border-primary bg-primary/15 text-primary" : "text-muted-foreground"}`}
               >
-                {p}
+                {labelize(p)}
               </button>
             ))}
           </div>
