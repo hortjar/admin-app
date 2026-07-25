@@ -4,11 +4,11 @@ import { Elysia, t } from "elysia";
 import { apps, database, users } from "../db";
 import { recordAudit } from "../lib/audit";
 import { clearRefreshCookie, readRefreshCookie, setRefreshCookie } from "../lib/cookies";
-import { hashPassword, verifyPassword } from "../lib/password";
 import { toUserDto } from "../lib/mappers";
+import { hashPassword, verifyPassword } from "../lib/password";
+import { adminAuth } from "../middleware/auth";
 import { computeGrants } from "../services/grants";
 import { issueSession, revokeSession, rotateSession } from "../services/sessions";
-import { adminAuth } from "../middleware/auth";
 
 const AuthResponse = t.Object({
   user: t.Any(),

@@ -1,5 +1,7 @@
 import { database, auditLogs } from "../db";
 
+import { logger } from "./logger";
+
 export interface AuditInput {
   actorId?: string | null;
   actorEmail?: string | null;
@@ -10,11 +12,9 @@ export interface AuditInput {
   ip?: string | null;
 }
 
-/** Record a privileged action. Fire-and-forget; never blocks the request path. */
-export function recordAudit(input: AuditInput): void {
-  database
-    .insert(auditLogs)
-    .values({
+async function writeAudit(input: AuditInput): Promise<void> {
+  try {
+    await database.insert(auditLogs).values({
       actorId: input.actorId ?? null,
       actorEmail: input.actorEmail ?? null,
       action: input.action,
@@ -22,8 +22,13 @@ export function recordAudit(input: AuditInput): void {
       targetId: input.targetId ?? null,
       metadata: input.metadata ?? null,
       ip: input.ip ?? null,
-    })
-    .catch(() => {
-      // Auditing must never break the primary operation.
     });
+  } catch (error) {
+    logger.warn({ err: error, action: input.action }, "Failed to record audit entry");
+  }
+}
+
+/** Record a privileged action. Fire-and-forget; never blocks the request path. */
+export function recordAudit(input: AuditInput): void {
+  void writeAudit(input);
 }

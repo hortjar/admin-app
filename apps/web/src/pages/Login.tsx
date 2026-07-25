@@ -3,11 +3,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { ApiError } from "@/api/http";
+import { useAuth } from "@/auth/context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/auth/AuthContext";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -15,8 +15,12 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
+  function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    void submit();
+  }
+
+  async function submit() {
     setBusy(true);
     try {
       await login(email, password);

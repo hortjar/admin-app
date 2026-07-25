@@ -11,6 +11,11 @@ export function SessionsPage() {
   const { data, isLoading } = useSessions();
   const revoke = useRevokeSession();
 
+  async function revokeSession(id: string) {
+    await revoke.mutateAsync(id);
+    toast.success("Session revoked");
+  }
+
   return (
     <div>
       <PageHeader title="Sessions" description="Active refresh-token sessions across all apps" />
@@ -54,10 +59,7 @@ export function SessionsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={async () => {
-                      await revoke.mutateAsync(s.id);
-                      toast.success("Session revoked");
-                    }}
+                    onClick={() => void revokeSession(s.id)}
                   >
                     Revoke
                   </Button>

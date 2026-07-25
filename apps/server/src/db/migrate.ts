@@ -10,7 +10,7 @@ const migrationClient = postgres(env.databaseUrl, { max: 1 });
 
 // Resolve relative to this file so it works regardless of the process CWD
 // (e.g. `pnpm migrate` from apps/server, or `bun …` from /app in Docker).
-const migrationsFolder = fileURLToPath(new URL("./migrations", import.meta.url));
+const migrationsFolder = fileURLToPath(new URL("migrations", import.meta.url));
 
 async function main() {
   console.log("Running migrations…");
@@ -19,7 +19,9 @@ async function main() {
   await migrationClient.end();
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   console.error("Migration failed:", error);
   process.exit(1);
-});
+}

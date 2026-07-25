@@ -16,7 +16,7 @@ export function universalAuthPlugin(config: UniversalAuthConfig) {
 
   return new Elysia({ name: "universal-auth" })
     .derive({ as: "global" }, async ({ headers }) => {
-      const header = headers["authorization"];
+      const header = headers.authorization;
       if (!header?.startsWith("Bearer ")) {
         return { universalUser: null as UniversalUser | null };
       }
@@ -25,10 +25,12 @@ export function universalAuthPlugin(config: UniversalAuthConfig) {
     .macro({
       requireUniversal: {
         beforeHandle({ universalUser, set }: { universalUser: UniversalUser | null; set: { status?: number | string } }) {
-          if (!universalUser) {
-            set.status = 401;
-            return { error: "Unauthorized" };
+          if (universalUser) {
+            return;
           }
+
+          set.status = 401;
+          return { error: "Unauthorized" };
         },
       },
     });

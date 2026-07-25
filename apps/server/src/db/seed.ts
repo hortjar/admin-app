@@ -1,9 +1,10 @@
 import { eq, sql } from "drizzle-orm";
 
-import { apps, database, users } from ".";
 import { env } from "../env";
 import { logger } from "../lib/logger";
 import { hashPassword } from "../lib/password";
+
+import { apps, database, users } from ".";
 
 /**
  * Idempotent bootstrap run on every server start:
@@ -55,13 +56,12 @@ async function ensureApp(input: {
 
 // Allow running directly: `bun run src/db/seed.ts`
 if (import.meta.main) {
-  runBootstrap()
-    .then(() => {
-      logger.info("Bootstrap complete.");
-      process.exit(0);
-    })
-    .catch((error) => {
-      logger.error({ err: error }, "Bootstrap failed");
-      process.exit(1);
-    });
+  try {
+    await runBootstrap();
+    logger.info("Bootstrap complete.");
+    process.exit(0);
+  } catch (error) {
+    logger.error({ err: error }, "Bootstrap failed");
+    process.exit(1);
+  }
 }

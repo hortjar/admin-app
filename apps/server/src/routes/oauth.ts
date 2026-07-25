@@ -58,7 +58,7 @@ export const oauthRoutes = new Elysia({ tags: ["oauth"] })
   .get(
     "/oauth/userinfo",
     async ({ headers, query, set }) => {
-      const header = headers["authorization"];
+      const header = headers.authorization;
       const claims = header?.startsWith("Bearer ")
         ? await verifyAccessToken(header.slice(7))
         : null;

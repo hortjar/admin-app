@@ -2,7 +2,6 @@ import { KeyRound, Plus, Search, Trash2, UserCog } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ApiError } from "@/api/http";
 import {
   useApps,
   useCreateUser,
@@ -12,6 +11,7 @@ import {
   useUpdateUser,
   useUsers,
 } from "@/api/hooks";
+import { ApiError } from "@/api/http";
 import type { AppDto, UserDto } from "@/api/types";
 import { PageHeader } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
@@ -179,7 +179,7 @@ function CreateUserDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={submit} disabled={create.isPending}>
+          <Button onClick={() => void submit()} disabled={create.isPending}>
             Create
           </Button>
         </DialogFooter>
@@ -239,7 +239,7 @@ function ManageUserDialog({ user, apps, onClose }: { user: UserDto; apps: AppDto
             <select
               className="h-9 rounded-md border border-input bg-background px-3 text-sm"
               value={user.role}
-              onChange={(e) => changeRole(e.target.value)}
+              onChange={(e) => void changeRole(e.target.value)}
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
@@ -252,7 +252,7 @@ function ManageUserDialog({ user, apps, onClose }: { user: UserDto; apps: AppDto
               <div className="text-sm font-medium">Account enabled</div>
               <div className="text-xs text-muted-foreground">Disabling revokes all sessions</div>
             </div>
-            <Switch checked={!user.disabled} onCheckedChange={toggleDisabled} />
+            <Switch checked={!user.disabled} onCheckedChange={() => void toggleDisabled()} />
           </div>
 
           <div>
@@ -273,7 +273,7 @@ function ManageUserDialog({ user, apps, onClose }: { user: UserDto; apps: AppDto
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
-              <Button variant="secondary" onClick={doReset} disabled={reset.isPending}>
+              <Button variant="secondary" onClick={() => void doReset()} disabled={reset.isPending}>
                 <KeyRound className="h-4 w-4" /> Reset
               </Button>
             </div>
@@ -281,7 +281,7 @@ function ManageUserDialog({ user, apps, onClose }: { user: UserDto; apps: AppDto
         </div>
 
         <DialogFooter className="justify-between">
-          <Button variant="destructive" onClick={doDelete}>
+          <Button variant="destructive" onClick={() => void doDelete()}>
             <Trash2 className="h-4 w-4" /> Delete user
           </Button>
           <Button variant="outline" onClick={onClose}>
@@ -312,7 +312,7 @@ function MembershipEditor({ user, app }: { user: UserDto; app: AppDto }) {
     <div className="rounded-md border p-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-medium">{app.name}</span>
-        <Button size="sm" variant="secondary" onClick={save} disabled={setMembership.isPending}>
+        <Button size="sm" variant="secondary" onClick={() => void save()} disabled={setMembership.isPending}>
           Save
         </Button>
       </div>

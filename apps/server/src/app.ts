@@ -1,22 +1,23 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
+
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { staticPlugin } from "@elysiajs/static";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import { Elysia } from "elysia";
 
 import { env } from "./env";
 import { logger } from "./lib/logger";
-import { authRoutes } from "./routes/auth";
-import { oauthRoutes } from "./routes/oauth";
-import { logIngestRoutes } from "./routes/logs-ingest";
-import { healthRoutes } from "./routes/health";
-import { adminUserRoutes } from "./routes/admin/users";
 import { adminAppRoutes } from "./routes/admin/apps";
-import { adminLogRoutes } from "./routes/admin/logs";
 import { adminAuditRoutes } from "./routes/admin/audit";
+import { adminLogRoutes } from "./routes/admin/logs";
 import { adminSessionRoutes } from "./routes/admin/sessions";
 import { adminStatsRoutes } from "./routes/admin/stats";
+import { adminUserRoutes } from "./routes/admin/users";
+import { authRoutes } from "./routes/auth";
+import { healthRoutes } from "./routes/health";
+import { logIngestRoutes } from "./routes/logs-ingest";
+import { oauthRoutes } from "./routes/oauth";
 
 export function buildApp() {
   const app = new Elysia()
@@ -67,7 +68,7 @@ export function buildApp() {
     app.use(staticPlugin({ assets: staticDir, prefix: "/" }));
     app.get("/*", ({ set }) => {
       set.headers["content-type"] = "text/html";
-      return Bun.file(join(staticDir, "index.html"));
+      return Bun.file(path.join(staticDir, "index.html"));
     });
   }
 

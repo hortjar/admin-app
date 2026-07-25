@@ -1,5 +1,5 @@
 import type { ApiKeyDto } from "@universal-admin/shared";
-import { desc, eq, isNull } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { apiKeys, apps, database } from "../../db";

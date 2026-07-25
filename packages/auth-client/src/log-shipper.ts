@@ -49,7 +49,7 @@ export class LogShipper {
 
   async flush(): Promise<void> {
     if (this.buffer.length === 0 || !this.config.apiKey) return;
-    const batch = this.buffer.splice(0, this.buffer.length);
+    const batch = this.buffer.splice(0);
     try {
       await fetch(this.endpoint, {
         method: "POST",

@@ -9,8 +9,11 @@ importers:
   .:
     devDependencies:
       '@hortjar/eslint-config':
-        specifier: ^0.2.0
-        version: 0.2.0(@typescript-eslint/utils@8.65.0(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3)
+        specifier: ^0.3.0
+        version: 0.3.0(@typescript-eslint/utils@8.65.0(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3)
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.1
       concurrently:
         specifier: ^9.1.0
         version: 9.2.4
@@ -810,8 +813,8 @@ packages:
     peerDependencies:
       typescript: ^5.5.3
 
-  '@hortjar/eslint-config@0.2.0':
-    resolution: {integrity: sha512-0lP0akZyHR85OQ3wMC+lEIcim6F3vwN4OcPOe3VyUH/q985jNt6yZZuHlEIs5Xo2O3uLCniZNBBhJdSFmoKiOg==}
+  '@hortjar/eslint-config@0.3.0':
+    resolution: {integrity: sha512-/0hKxBwsYOVYxpGryLSKbtuMoU4lq2DhfQO1RXm8j+3yflbbDX7yRYzztZlV6K0poA4bbbYgSahlHQdP7Yn1Og==}
     engines: {node: '>=22.22'}
     peerDependencies:
       eslint: ^9.20.0 || ^10.0.0
@@ -3522,7 +3525,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@hortjar/eslint-config@0.2.0(@typescript-eslint/utils@8.65.0(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3)':
+  '@hortjar/eslint-config@0.3.0(@typescript-eslint/utils@8.65.0(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.8.0(jiti@2.7.0))(typescript@5.9.3)':
     dependencies:
       '@eslint/js': 10.0.1(eslint@10.8.0(jiti@2.7.0))
       eslint: 10.8.0(jiti@2.7.0)

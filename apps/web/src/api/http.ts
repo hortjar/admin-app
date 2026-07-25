@@ -71,7 +71,7 @@ export interface RequestOptions {
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const doFetch = async (): Promise<Response> => {
-    const url = new URL(path, window.location.origin);
+    const url = new URL(path, location.origin);
     if (options.query) {
       for (const [k, v] of Object.entries(options.query)) {
         if (v !== undefined && v !== "") url.searchParams.set(k, String(v));
@@ -79,13 +79,13 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     }
     const headers: Record<string, string> = { "content-type": "application/json" };
     if (!options.anonymous && tokenStore.access) {
-      headers["authorization"] = `Bearer ${tokenStore.access}`;
+      headers.authorization = `Bearer ${tokenStore.access}`;
     }
-    return fetch(url.toString(), {
+    return fetch(url.href, {
       method: options.method ?? "GET",
       headers,
       credentials: "include",
-      body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
     });
   };
 

@@ -2,7 +2,6 @@ import { Copy, KeyRound, Plus, Settings2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ApiError } from "@/api/http";
 import {
   useApps,
   useAppKeys,
@@ -11,6 +10,7 @@ import {
   useRevokeAppKey,
   useUpdateApp,
 } from "@/api/hooks";
+import { ApiError } from "@/api/http";
 import type { AppDto } from "@/api/types";
 import { PageHeader } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
@@ -137,7 +137,7 @@ function CreateAppDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={submit} disabled={create.isPending}>
+          <Button onClick={() => void submit()} disabled={create.isPending}>
             Register
           </Button>
         </DialogFooter>
@@ -169,6 +169,11 @@ function ManageAppDialog({ app, onClose }: { app: AppDto; onClose: () => void })
     onClose();
   }
 
+  async function copyKey(value: string) {
+    await navigator.clipboard.writeText(value);
+    toast.success("Copied");
+  }
+
   async function addKey() {
     if (!keyName) return;
     const res = await createKey.mutateAsync({ appId: app.id, name: keyName });
@@ -189,7 +194,7 @@ function ManageAppDialog({ app, onClose }: { app: AppDto; onClose: () => void })
             <Label>Allowed origins (comma-separated)</Label>
             <div className="flex gap-2">
               <Input value={origins} onChange={(e) => setOrigins(e.target.value)} placeholder="https://app.example.com" />
-              <Button variant="secondary" onClick={saveOrigins}>
+              <Button variant="secondary" onClick={() => void saveOrigins()}>
                 Save
               </Button>
             </div>
@@ -208,10 +213,7 @@ function ManageAppDialog({ app, onClose }: { app: AppDto; onClose: () => void })
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => {
-                      navigator.clipboard.writeText(freshKey);
-                      toast.success("Copied");
-                    }}
+                    onClick={() => void copyKey(freshKey)}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -220,7 +222,7 @@ function ManageAppDialog({ app, onClose }: { app: AppDto; onClose: () => void })
             )}
             <div className="mb-3 flex gap-2">
               <Input placeholder="Key name (e.g. prod-log-shipper)" value={keyName} onChange={(e) => setKeyName(e.target.value)} />
-              <Button onClick={addKey} disabled={createKey.isPending}>
+              <Button onClick={() => void addKey()} disabled={createKey.isPending}>
                 <Plus className="h-4 w-4" /> Create
               </Button>
             </div>
@@ -248,7 +250,7 @@ function ManageAppDialog({ app, onClose }: { app: AppDto; onClose: () => void })
         </div>
 
         <DialogFooter className="justify-between">
-          <Button variant={app.disabled ? "default" : "destructive"} onClick={toggleDisabled}>
+          <Button variant={app.disabled ? "default" : "destructive"} onClick={() => void toggleDisabled()}>
             {app.disabled ? "Enable app" : "Disable app"}
           </Button>
           <Button variant="outline" onClick={onClose}>

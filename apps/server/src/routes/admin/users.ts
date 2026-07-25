@@ -6,9 +6,9 @@ import { apps, database, memberships, users } from "../../db";
 import { recordAudit } from "../../lib/audit";
 import { toUserDto } from "../../lib/mappers";
 import { hashPassword } from "../../lib/password";
+import { adminAuth } from "../../middleware/auth";
 import { computeGrants } from "../../services/grants";
 import { revokeAllSessions } from "../../services/sessions";
-import { adminAuth } from "../../middleware/auth";
 
 const Error = t.Object({ error: t.String() });
 

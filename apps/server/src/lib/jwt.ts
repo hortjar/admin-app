@@ -2,6 +2,7 @@ import type { AccessTokenClaims, AppGrant, GlobalRole } from "@universal-admin/s
 import { jwtVerify, SignJWT } from "jose";
 
 import { env } from "../env";
+
 import { getKeys, getLocalJwkSet, SIGNING_ALG } from "./keys";
 
 export interface SignAccessTokenInput {

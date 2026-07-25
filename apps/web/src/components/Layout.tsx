@@ -10,9 +10,9 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
+import { useAuth } from "@/auth/context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/auth/AuthContext";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },

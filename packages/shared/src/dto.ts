@@ -1,6 +1,6 @@
+import type { LogLevel } from "./logs.js";
 import type { AppGrant } from "./permissions.js";
 import type { GlobalRole } from "./roles.js";
-import type { LogLevel } from "./logs.js";
 
 export interface UserDto {
   id: string;

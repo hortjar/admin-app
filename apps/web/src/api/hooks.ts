@@ -66,11 +66,13 @@ export function useUpdateUser() {
       return { snapshots };
     },
     onError: (_e, _v, ctx) => {
-      ctx?.snapshots.forEach(([key, page]) => qc.setQueryData(key, page));
+      for (const [key, page] of ctx?.snapshots ?? []) qc.setQueryData(key, page);
     },
-    onSettled: (_d, _e, v) => {
-      qc.invalidateQueries({ queryKey: ["users"] });
-      qc.invalidateQueries({ queryKey: ["user", v.id] });
+    onSettled: async (_d, _e, v) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["users"] }),
+        qc.invalidateQueries({ queryKey: ["user", v.id] }),
+      ]);
     },
   });
 }
@@ -99,9 +101,11 @@ export function useSetMembership() {
         method: "PUT",
         body: { roles, permissions },
       }),
-    onSuccess: (_d, v) => {
-      qc.invalidateQueries({ queryKey: ["user", v.userId] });
-      qc.invalidateQueries({ queryKey: ["users"] });
+    onSuccess: async (_d, v) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["user", v.userId] }),
+        qc.invalidateQueries({ queryKey: ["users"] }),
+      ]);
     },
   });
 }

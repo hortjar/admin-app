@@ -5,6 +5,7 @@ import { Elysia } from "elysia";
 import { apiKeys, apps, database } from "../db";
 import { sha256 } from "../lib/crypto";
 import { verifyAccessToken } from "../lib/jwt";
+import { logger } from "../lib/logger";
 
 export interface AdminContextUser {
   id: string;
@@ -20,12 +21,12 @@ export interface AdminContextUser {
  */
 export const adminAuth = new Elysia({ name: "admin-auth" })
   .derive({ as: "global" }, async ({ headers }) => {
-    const header = headers["authorization"];
+    const header = headers.authorization;
     if (!header?.startsWith("Bearer ")) return { admin: null as AdminContextUser | null };
     const claims = await verifyAccessToken(header.slice(7));
     if (!claims) return { admin: null as AdminContextUser | null };
     return {
-      admin: { id: claims.sub, email: claims.email, role: claims.role } as AdminContextUser,
+      admin: { id: claims.sub, email: claims.email, role: claims.role },
     };
   })
   .macro({
@@ -55,6 +56,14 @@ export const adminAuth = new Elysia({ name: "admin-auth" })
     },
   });
 
+async function stampApiKeyUsed(id: string): Promise<void> {
+  try {
+    await database.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, id));
+  } catch (error) {
+    logger.warn({ err: error, apiKeyId: id }, "Failed to stamp API key last-used timestamp");
+  }
+}
+
 /**
  * API-key auth for service-to-service endpoints (log ingestion, introspection).
  * Resolves the calling app from a `uak_...` key in the `x-api-key` header.
@@ -80,21 +89,19 @@ export const apiKeyAuth = new Elysia({ name: "api-key-auth" })
     if (!app || app.disabled) return { callerApp: null as { id: string; slug: string } | null };
 
     // Best-effort last-used stamp.
-    database
-      .update(apiKeys)
-      .set({ lastUsedAt: new Date() })
-      .where(eq(apiKeys.id, key.id))
-      .catch(() => {});
+    void stampApiKeyUsed(key.id);
 
     return { callerApp: { id: app.id, slug: app.slug } };
   })
   .macro({
     requireApiKey: {
       beforeHandle({ callerApp, set }) {
-        if (!callerApp) {
-          set.status = 401;
-          return { error: "Invalid or missing API key" };
+        if (callerApp) {
+          return;
         }
+
+        set.status = 401;
+        return { error: "Invalid or missing API key" };
       },
     },
   });

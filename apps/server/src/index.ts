@@ -1,8 +1,8 @@
 import { buildApp } from "./app";
+import { runBootstrap } from "./db/seed";
 import { env } from "./env";
 import { getKeys } from "./lib/keys";
 import { logger } from "./lib/logger";
-import { runBootstrap } from "./db/seed";
 
 async function main() {
   // Ensure a signing key + bootstrap admin exist before accepting traffic.
@@ -16,7 +16,9 @@ async function main() {
   logger.info(`OpenAPI docs at ${env.issuer}/openapi`);
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   logger.error({ err: error }, "Failed to start server");
   process.exit(1);
-});
+}

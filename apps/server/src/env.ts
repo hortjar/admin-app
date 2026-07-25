@@ -8,6 +8,11 @@ function optional(name: string, fallback: string): string {
   return process.env[name] ?? fallback;
 }
 
+function optionalOrUndefined(name: string): string | undefined {
+  const value = process.env[name];
+  return value === undefined || value === "" ? undefined : value;
+}
+
 export const env = {
   port: Number(optional("PORT", "9000")),
   issuer: optional("ISSUER", "http://localhost:9000"),
@@ -16,7 +21,7 @@ export const env = {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean),
-  signingKeyPemBase64: process.env["SIGNING_KEY_PEM_BASE64"] ?? null,
+  signingKeyPemBase64: process.env.SIGNING_KEY_PEM_BASE64 ?? null,
   accessTokenTtl: Number(optional("ACCESS_TOKEN_TTL", "900")),
   refreshTokenTtl: Number(optional("REFRESH_TOKEN_TTL", "2592000")),
   bootstrapAdminEmail: optional("BOOTSTRAP_ADMIN_EMAIL", "admin@example.com"),
@@ -31,10 +36,10 @@ export const env = {
   cookies: {
     enabled: optional("ENABLE_AUTH_COOKIES", "true") !== "false",
     /** e.g. ".hortjar.cz" to share across *.hortjar.cz. Empty = host-only cookie. */
-    domain: process.env["COOKIE_DOMAIN"] || undefined,
+    domain: optionalOrUndefined("COOKIE_DOMAIN"),
     name: optional("COOKIE_REFRESH_NAME", "ua_refresh"),
     /** Secure cookies require HTTPS; default on in production. */
-    secure: optional("COOKIE_SECURE", process.env["NODE_ENV"] === "production" ? "true" : "false") !== "false",
+    secure: optional("COOKIE_SECURE", process.env.NODE_ENV === "production" ? "true" : "false") !== "false",
     /** "lax" works for same-site subdomains; "none" needed for cross-site (requires Secure). */
     sameSite: optional("COOKIE_SAMESITE", "lax") as "lax" | "strict" | "none",
   },
