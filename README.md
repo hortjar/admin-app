@@ -7,12 +7,12 @@ you manage users, per-app roles & permissions, sessions, API keys, and collected
 - **Backend** — Elysia (Bun) + PostgreSQL (Drizzle ORM), RS256 JWTs published via JWKS.
 - **Frontend** — Vite + React + TypeScript SPA, TanStack Query, shadcn/ui.
 - **API client** — generated from the live OpenAPI spec with [hey-api](https://heyapi.dev).
-- **Deploy** — one container on **:9200** (API + SPA) + Postgres, via Docker Compose / Portainer.
+- **Deploy** — one container on **:9000** (API + SPA) + Postgres, via Docker Compose / Portainer.
 - **Monorepo** — pnpm workspaces.
 
 ```
 apps/
-  server/   Elysia API + serves the built SPA (port 9200)
+  server/   Elysia API + serves the built SPA (port 9000)
   web/      React admin SPA
 packages/
   shared/       shared TS types (roles, permissions, DTOs, token claims)
@@ -46,7 +46,7 @@ and publishes the public keys at `/.well-known/jwks.json`.
 
 ```jsonc
 {
-  "iss": "http://localhost:9200",
+  "iss": "http://localhost:9000",
   "sub": "<user id>",
   "aud": "file-sync",            // the app this token is for
   "email": "alice@example.com",
@@ -64,9 +64,9 @@ and publishes the public keys at `/.well-known/jwks.json`.
 pnpm install
 pnpm --filter @universal-admin/shared build     # build shared types
 cp .env.example .env                             # then edit as needed
-pnpm db:up                                        # Postgres on :5433 (docker)
+pnpm db:up                                        # Postgres on :9002 (docker)
 pnpm migrate                                       # create tables
-pnpm dev                                           # server :9200 + SPA :5173
+pnpm dev                                           # server :9000 + SPA :9001
 ```
 
 Log into the SPA with the bootstrap admin from your `.env`
@@ -81,7 +81,7 @@ pnpm generate:api        # hey-api → apps/web/src/api/generated
 ## Deploying with Portainer
 
 The `docker-compose.yml` builds a single image that serves the API and the built SPA
-on **:9200**, alongside a Postgres service. In Portainer, create a stack from the compose
+on **:9000**, alongside a Postgres service. In Portainer, create a stack from the compose
 file and set these environment variables:
 
 | Variable | Purpose |
@@ -101,7 +101,7 @@ Each app has an `AUTH_MODE` switch. `local` = the app's own auth (unchanged);
 
 ```bash
 AUTH_MODE=universal
-UNIVERSAL_AUTH_URL=http://localhost:9200
+UNIVERSAL_AUTH_URL=http://localhost:9000
 UNIVERSAL_AUTH_APP=file-sync          # must match the app slug registered here
 # For log shipping (create an API key in the console → Apps → Manage):
 UNIVERSAL_AUTH_API_KEY=uak_xxx.xxxxxxxx

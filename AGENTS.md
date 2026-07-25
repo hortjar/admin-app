@@ -6,7 +6,7 @@ full overview; this file is the canonical working reference for agents.
 ## Stack & layout
 
 - pnpm monorepo. Backend: **Elysia on Bun** + **Postgres/Drizzle**. Frontend: **Vite + React**.
-- `apps/server` — API + serves the built SPA on **:9200**.
+- `apps/server` — API + serves the built SPA on **:9000**.
 - `apps/web` — React admin SPA (TanStack Query, shadcn/ui, react-router, hey-api client).
 - `packages/shared` — types shared across server/web/auth-client. **Build it first** (`tsc`).
 - `packages/auth-client` — Elysia plugin + JWKS verifier + log shipper for downstream apps.
@@ -28,8 +28,8 @@ full overview; this file is the canonical working reference for agents.
 ```bash
 pnpm install
 pnpm --filter @universal-admin/shared build   # required before typechecking server/web
-pnpm db:up && pnpm migrate                     # Postgres :5433 + schema
-pnpm dev                                        # server :9200 + SPA :5173
+pnpm db:up && pnpm migrate                     # Postgres :9002 + schema
+pnpm dev                                        # server :9000 + SPA :9001
 pnpm --filter @universal-admin/server generate # regenerate Drizzle migration after schema edits
 pnpm generate:api                               # hey-api client from the live spec (server must be up)
 pnpm -r lint                                    # typecheck all packages

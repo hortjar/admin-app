@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: 9001,
     proxy: {
       // Proxy API calls to the universal server during development.
       "/api": "http://localhost:9000",

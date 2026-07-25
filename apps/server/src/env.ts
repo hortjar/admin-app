@@ -12,7 +12,7 @@ export const env = {
   port: Number(optional("PORT", "9000")),
   issuer: optional("ISSUER", "http://localhost:9000"),
   databaseUrl: required("DATABASE_URL"),
-  corsOrigins: optional("CORS_ORIGINS", "http://localhost:9000,http://localhost:5173")
+  corsOrigins: optional("CORS_ORIGINS", "http://localhost:9000,http://localhost:9001")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean),
